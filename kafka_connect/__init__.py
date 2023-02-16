@@ -1,7 +1,7 @@
 from collections import MutableMapping
 from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
-import json
+import json, base64
 
 __all__ = ['KafkaConnect']
 
@@ -192,12 +192,14 @@ class Connectors(MutableMapping):
 class API(object):
     """ Kafka Connect REST API Object """
 
-    __slots__ = 'host', 'port', 'url', 'autocommit', 'version', 'commit', 'kafka_cluster_id'
+    __slots__ = 'host', 'port', 'url', 'user', 'password', 'autocommit', 'version', 'commit', 'kafka_cluster_id'
 
-    def __init__(self, host='localhost', port=8083, scheme='http', autocommit=True):
+    def __init__(self, host='localhost', port=8083, scheme='http', user='', password='', autocommit=True):
         self.host = host
         self.port = port
         self.url = "{}://{}:{}".format(scheme, host, port)
+        self.user = user
+        self.password = password
         self.autocommit = autocommit
         self.ping()
 
@@ -214,6 +216,11 @@ class API(object):
         request = Request(request_url, method=method)
         request.add_header('Accept', 'application/json')
         request.add_header('Content-Type', 'application/json')
+
+        if len(self.user) > 0:
+            base64string = base64.b64encode(bytes('%s:%s' % (self.user, self.password),'ascii'))
+            request.add_header('Authorization','Basic %s' % base64string.decode('utf-8'))
+
         return request
 
     def response(self, request):
@@ -283,8 +290,8 @@ class KafkaConnect:
 
     __slots__ = 'api', 'connectors'
 
-    def __init__(self, host='localhost', port=8083, scheme='http'):
-        self.api = API(host=host, port=port, scheme=scheme)
+    def __init__(self, host='localhost', port=8083, scheme='http', user='', password=''):
+        self.api = API(host=host, port=port, scheme=scheme, user=user, password=password)
         self.connectors = Connectors(self.api)
 
     @property
