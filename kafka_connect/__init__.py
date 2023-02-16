@@ -26,11 +26,12 @@ class NotFoundError(Error):
 class TaskStatus:
     """ TaskStatus Type """
 
-    __slots__ = 'id', 'state', 'worker_id'
+    __slots__ = 'id', 'state', 'trace', 'worker_id'
 
-    def __init__(self, id, state, worker_id):
+    def __init__(self, id, state, trace, worker_id):
         self.id = id
         self.state = state
+        self.trace = trace
         self.worker_id = worker_id
 
 
@@ -51,8 +52,9 @@ class Task:
             '/connectors/{}/tasks/{}/status'.format(self.connector, self.id))
         id = response.get('id')
         state = response.get('state')
+        trace = response.get('trace')
         worker_id = response.get('worker_id')
-        return TaskStatus(id=id, state=state, worker_id=worker_id)
+        return TaskStatus(id=id, state=state, trace=trace, worker_id=worker_id)
 
     def restart(self):
         self._api.post(
