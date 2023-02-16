@@ -7,11 +7,7 @@ Python module for Kafka Connect REST API
 
 ## Installation
 
-Install using `pip`...
-
-```sh
-    pip install kafka-connect-python
-```
+There is no package provided (yet), add this module to the respective source code repository.
 
 ## Examples
 
@@ -19,7 +15,7 @@ Install using `pip`...
 ```python
 from kafka_connect import KafkaConnect
 
-connect = KafkaConnect(host='localhost', port=8083, scheme='http')
+connect = KafkaConnect(host='localhost', port=8083, scheme='http', user='my_user_name', password='my_password')
 
 print(connect.api.version)
 
